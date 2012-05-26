@@ -92,6 +92,17 @@ class SiteController extends Controller
 		$this->render('login',array('model'=>$model));
 	}
 
+
+    public function actionTest()
+    {
+        $model =  LogNginx::model();
+        $model->full_message='xxx';
+        $model->priority='1';
+        $model->type='nginx';
+        $model->request='127.0.0.1';
+        $model->save();
+    }
+
 	/**
 	 * Logs out the current user and redirect to homepage.
 	 */

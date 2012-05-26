@@ -171,6 +171,13 @@ class SystemEvents extends CActiveRecord
 
                          if(isset($out['message']))
                              return $out['message'];
+                     } else if (in_array('nginx',$this->getTags()))
+                     {
+                         preg_match('/^(?<dat>.*) \[(?<error_level>.+)\] (?<nubmer>.+): \*(?<nubmer2>.+) (?<message>.+), (?<other>.+)$/U', $this->Message, $out);
+
+                         if(isset($out['message']))
+                             return $out['message'];
+
                      }
 
 
