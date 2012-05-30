@@ -95,12 +95,14 @@ class SiteController extends Controller
 
     public function actionTest()
     {
-        $model =  LogNginx::model();
-        $model->full_message='xxx';
-        $model->priority='1';
-        $model->type='nginx';
-        $model->request='127.0.0.1';
-        $model->save();
+        $model = SystemEvents::model()->findByPk(14);
+        var_dump($model);
+       // echo $model->related_event->message;
+
+        die();
+
+        $model = new SystemEventsAnalyzer();
+        $model->collect();
     }
 
 	/**

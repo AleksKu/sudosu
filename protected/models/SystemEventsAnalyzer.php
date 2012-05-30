@@ -13,6 +13,30 @@ class SystemEventsAnalyzer
     public function collect()
     {
 
+        //@todo обернуть в транзакцию
+
+        $events = SystemEvents::model()->notAnalyzed()->findAll();
+        /* @var $event SystemEvents */
+
+        foreach($events as $event)
+        {
+            $event->getType();
+            if($event->isDefined())
+            {
+                $relatedEvent = $event->getRelatedEvent();
+
+                $relatedEvent->parseMessage();
+                if($relatedEvent->save())
+                {
+
+                }
+
+            }
+
+
+            $event->is_analyzed=1;
+            $event->save();
+        }
     }
 
 }

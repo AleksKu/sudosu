@@ -1,37 +1,42 @@
 <?php
 
 /**
- * This is the model class for table "log_php_fpm".
+ * This is the model class for table "php_fpm_event".
  *
- * The followings are the available columns in table 'log_php_fpm':
- * @property integer $log_id
+ * The followings are the available columns in table 'php_fpm_event':
+ * @property string $system_event_id
  * @property string $message
  * @property string $trace
  * @property string $file
  * @property string $level
  *
  * The followings are the available model relations:
- * @property Log $log
+ * @property SystemEvents $systemEvent
  */
-class LogPhpFpm extends Log
+class PhpFpmEvent extends DefinedEvent
 {
+
+    const TYPE = 'php_fpm';
+
+    protected $regexp = '/^(?<pool>.*): (?<level>.+): (?<message>.+) in (?<file>.+)$/';
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
-	 * @return LogPhpFpm the static model class
+	 * @return PhpFpmEvent the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
-
-    function defaultScope(){
-        return array(
-            'condition'=>"type='php_fpm'",
-        );
-    }
 	
-
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'php_fpm_event';
+	}
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -41,27 +46,17 @@ class LogPhpFpm extends Log
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('log_id', 'required'),
-			array('log_id', 'numerical', 'integerOnly'=>true),
+			array('system_event_id', 'required'),
+			array('system_event_id', 'length', 'max'=>10),
 			array('file, level', 'length', 'max'=>255),
 			array('message, trace', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('log_id, message, trace, file, level', 'safe', 'on'=>'search'),
+			array('system_event_id, message, trace, file, level', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-/*	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'log' => array(self::BELONGS_TO, 'Log', 'log_id'),
-		);
-	}*/
+
 
 	/**
 	 * @return array customized attribute labels (name=>label)
@@ -69,7 +64,7 @@ class LogPhpFpm extends Log
 	public function attributeLabels()
 	{
 		return array(
-			'log_id' => 'Log',
+			'system_event_id' => 'System Event',
 			'message' => 'Message',
 			'trace' => 'Trace',
 			'file' => 'File',
@@ -88,7 +83,7 @@ class LogPhpFpm extends Log
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('log_id',$this->log_id);
+		$criteria->compare('system_event_id',$this->system_event_id,true);
 		$criteria->compare('message',$this->message,true);
 		$criteria->compare('trace',$this->trace,true);
 		$criteria->compare('file',$this->file,true);
@@ -98,4 +93,20 @@ class LogPhpFpm extends Log
 			'criteria'=>$criteria,
 		));
 	}
+
+
+    public function parseMessage()
+    {
+
+        preg_match($this->regexp, $this->systemEvent->Message, $out);
+
+
+            $this->message = isset($out['message']) ? $out['message'] : null;
+            $this->file = isset($out['file']) ? $out['file'] : null;
+            $this->level = isset($out['level']) ? $out['level'] : null;
+
+
+
+
+    }
 }

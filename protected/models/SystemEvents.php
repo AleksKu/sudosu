@@ -28,9 +28,29 @@
  * @property string $EventLogType
  * @property string $GenericFileName
  * @property integer $SystemID
+ * @property string $type
+ * @property string $hash
+ * @property integer $is_analyzed
  */
+
+
+
+
+
+
 class SystemEvents extends CActiveRecord
 {
+
+
+    const DEFAULT_TYPE = 'system';
+
+
+    protected $definedTypes = array(
+        'nginx' =>array('type'=>'nginx','class'=>'NginxEvent'),
+        'php_fpm'=>array('type'=>'php_fpm','class'=>'PhpFpmEvent')
+    );
+
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -57,13 +77,13 @@ class SystemEvents extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Facility, Priority, NTSeverity, Importance, EventCategory, EventID, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SystemID', 'numerical', 'integerOnly'=>true),
+			array('Facility, Priority, NTSeverity, Importance, EventCategory, EventID, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SystemID, is_analyzed', 'numerical', 'integerOnly'=>true),
 			array('CustomerID', 'length', 'max'=>20),
-			array('FromHost, EventSource, EventUser, SysLogTag, EventLogType, GenericFileName', 'length', 'max'=>60),
+			array('FromHost, EventSource, EventUser, SysLogTag, EventLogType, GenericFileName, type, hash', 'length', 'max'=>60),
 			array('ReceivedAt, DeviceReportedTime, Message, EventBinaryData', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, CustomerID, ReceivedAt, DeviceReportedTime, Facility, Priority, FromHost, Message, NTSeverity, Importance, EventSource, EventUser, EventCategory, EventID, EventBinaryData, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SysLogTag, EventLogType, GenericFileName, SystemID', 'safe', 'on'=>'search'),
+			array('ID, CustomerID, ReceivedAt, DeviceReportedTime, Facility, Priority, FromHost, Message, NTSeverity, Importance, EventSource, EventUser, EventCategory, EventID, EventBinaryData, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SysLogTag, EventLogType, GenericFileName, SystemID, type', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -72,11 +92,16 @@ class SystemEvents extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
+
 		return array(
+            'nginx'=>array(self::HAS_ONE, 'NginxEvent', 'system_event_id'),
+            'php_fpm'=>array(self::HAS_ONE, 'PhpFpmEvent', 'system_event_id'),
+            'event_report' => array(self::BELONGS_TO, 'EventReport', 'event_report_id'),
+            'related_event'=>array(self::HAS_ONE, 'DefinedEvent', 'system_event_id'),
 		);
 	}
+
+
 
 	/**
 	 * @return array customized attribute labels (name=>label)
@@ -199,4 +224,88 @@ class SystemEvents extends CActiveRecord
 
         return $tagsArray;
     }
+
+
+    public function getType()
+    {
+        if(empty($this->type))
+            $this->calcType();
+
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+
+    /**
+     * Вычисляет тип лога
+     * @return SystemEvents
+     */
+    public function calcType()
+    {
+        $this->type = self::DEFAULT_TYPE;
+        $tags = $this->getTags();
+
+       if(count($tags) == 1 )
+       {
+           $tag  = str_replace('-','_',$tags[0]);
+           if(array_key_exists($tag, $this->definedTypes))
+                $this->type = $this->definedTypes[$tag]['type'];
+
+       }
+
+
+        return $this;
+    }
+
+    /**
+     * получил эвент определение - известный ли у него тип?
+     * @return bool
+     */
+    public function isDefined()
+    {
+        return (!empty($this->type) && $this->type != self::DEFAULT_TYPE);
+    }
+
+
+    public function notAnalyzed()
+    {
+        $this->getDbCriteria()->mergeWith(array(
+            'condition'=>'is_analyzed=0'
+        ));
+        return $this;
+    }
+
+    /**
+     * @return DefinedEvent
+     * @throws CException
+     */
+    public function getRelatedEvent()
+    {
+        if(!$this->isDefined())
+            throw new CException('не удалось вычислить тип для этого события - получить связанный объект нельзя');
+
+
+        $related = $this->getRelated($this->type);
+        if(!$related)
+        {
+            $class = $this->getRelatedEventClassName();
+            $related = new $class;
+            $related->systemEvent = $this;
+        }
+
+        return $related;
+
+
+    }
+
+    public function getRelatedEventClassName()
+    {
+        return $this->definedTypes[$this->getType()]['class'];
+    }
+
+
 }
