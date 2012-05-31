@@ -52,16 +52,50 @@ class AdvancedSystemEvent extends CActiveRecord
 		return array(
 			array('system_event_id', 'required'),
 			array('system_event_id', 'length', 'max'=>10),
-			array('client, server, request, type, hash, file', 'length', 'max'=>255),
+			array('client, server, request, type, hash, file, level', 'length', 'max'=>255),
 			array('trace, referrer', 'length', 'max'=>65000),
 			array('message', 'safe'),
-            array('level', 'numerical', 'integerOnly'=>true),
 
             // The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('system_event_id, message, client, server, request, referrer, type, hash, level, file, trace', 'safe', 'on'=>'search'),
 		);
 	}
+
+    /**
+     * We're overriding this method to fill findAll() and similar method result
+     * with proper models.
+     *
+     * @param array $attributes
+     * @return AdvancedSystemEvent
+     */
+    protected function instantiate($attributes){
+        $class = AdvancedSystemEvent::getClassNameByType($attributes['type']);
+        $model=new $class(null);
+        return $model;
+    }
+
+
+    /**
+     * @static
+     * @param $type
+     * @return AdvancedSystemEvent
+     */
+    public static function getClassNameByType($type)
+    {
+        switch($type){
+            case NginxSystemEvent::EVENT_TYPE:
+                $class = 'NginxSystemEvent';
+                break;
+            case PhpFpmSystemEvent::EVENT_TYPE:
+                $class ='PhpFpmSystemEvent';
+                break;
+            default:
+                $class = 'AdvancedSystemEvent';
+        }
+
+        return $class;
+    }
 
 
     /**
@@ -117,6 +151,17 @@ class AdvancedSystemEvent extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+    public function parseSystemEventMessage($message)
+    {
+        return $this->message = $message;
+    }
+
+
+    public function hash()
+    {
+        return md5($this->message);
+    }
 
 
 
