@@ -213,19 +213,19 @@ class SystemEvents extends CActiveRecord
     {
         $advancedEvent = $this->getRelated('advanced_event');
 
-        if (!$advancedEvent) {
-            $class = AdvancedSystemEvent::getClassNameByType($this->getMainTag());
-            $advancedEvent = new $class;
+        if (!$advancedEvent && $class = AdvancedSystemEvent::getClassNameByType($this->getMainTag())) {
+             $advancedEvent = new $class;
         }
 
         if ($advancedEvent) {
             $this->initAdvancedSystemEvent($advancedEvent);
+            $advancedEvent->save();
 
         }
 
-        $advancedEvent->save();
 
-        //  $this->is_analyzed=1;
+
+        $this->is_analyzed=1;
 
     }
 

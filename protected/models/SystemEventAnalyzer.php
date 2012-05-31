@@ -17,7 +17,7 @@ class SystemEventAnalyzer
 
             $event->analyze();
             $event->save();
-            die();
+
         }
     }
 

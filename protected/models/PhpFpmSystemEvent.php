@@ -42,6 +42,6 @@ class PhpFpmSystemEvent extends AdvancedSystemEvent
 
     public function hash()
     {
-        return md5($this->message.$this->file);
+        $this->hash = md5($this->message.$this->file);
     }
 }

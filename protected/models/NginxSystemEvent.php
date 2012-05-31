@@ -11,7 +11,7 @@ class NginxSystemEvent extends AdvancedSystemEvent
 
     const EVENT_TYPE = 'nginx';
 
-    protected $regexp = '/^(?<date>.*) \[(?<level>.+)\] (?<nubmer>.+): \*(?<nubmer2>.+) (?<message>.+), client: (?<client>.+), server: (?<server>.+), request: (?<request>.+), upstream: (?<upstream>.+), host: (?<host>.+)(, referrer: (?<referrer>.+))*$/U';
+    protected $regexp = '/^(?<date>.*) \[(?<level>.+)\] (?<nubmer>.+): \*(?<nubmer2>.+) (?<message>.+), client: (?<client>.+), server: (?<server>.+), request: (?<request>.+)(, upstream: (?<upstream>.+))*, host: (?<host>.+)(, referrer: (?<referrer>.+))*$/U';
 
     static function model($className=__CLASS__) {
         return parent::model($className);

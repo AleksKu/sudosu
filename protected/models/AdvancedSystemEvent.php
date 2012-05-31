@@ -24,6 +24,13 @@ class AdvancedSystemEvent extends CActiveRecord
 {
 
 
+    /**
+     * @var int
+     */
+    public $eventCount = 0;
+    public $host;
+    public $receivedAt;
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -58,7 +65,7 @@ class AdvancedSystemEvent extends CActiveRecord
 
             // The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('system_event_id, message, client, server, request, referrer, type, hash, level, file, trace', 'safe', 'on'=>'search'),
+			array('system_event_id, message, client, server, request, referrer, type, hash, level, file, trace, host,receivedAt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,6 +78,9 @@ class AdvancedSystemEvent extends CActiveRecord
      */
     protected function instantiate($attributes){
         $class = AdvancedSystemEvent::getClassNameByType($attributes['type']);
+        if(!$class)
+            $class = 'AdvancedSystemEvent';
+
         $model=new $class(null);
         return $model;
     }
@@ -91,7 +101,7 @@ class AdvancedSystemEvent extends CActiveRecord
                 $class ='PhpFpmSystemEvent';
                 break;
             default:
-                $class = 'AdvancedSystemEvent';
+                $class = null;
         }
 
         return $class;
@@ -140,15 +150,24 @@ class AdvancedSystemEvent extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
+        $criteria->with = array('systemEvent');
 		$criteria->compare('system_event_id',$this->system_event_id,true);
+
+		$criteria->compare('systemEvent.FromHost',$this->host,true);
+		$criteria->compare('systemEvent.ReceivedAt',$this->receivedAt,true);
+
 		$criteria->compare('message',$this->message,true);
 		$criteria->compare('client',$this->client,true);
 		$criteria->compare('server',$this->server,true);
 		$criteria->compare('request',$this->request,true);
 		$criteria->compare('referrer',$this->referrer,true);
+		$criteria->compare('type',$this->type,true);
+
+        $criteria->order = 'system_event_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+            'pagination' => array('pageSize' => 50,),
 		));
 	}
 
@@ -161,6 +180,28 @@ class AdvancedSystemEvent extends CActiveRecord
     public function hash()
     {
         return md5($this->message);
+    }
+
+    /**
+     * scope для формирования отчета
+     * @return AdvancedSystemEvent
+     */
+    public function forReport()
+    {
+        $this->getDbCriteria()->mergeWith(array(
+            'select'=>'message,type, COUNT(*) AS eventCount',
+            'group' => 'hash',
+            'with'=>'systemEvent'
+        ));
+        return $this;
+    }
+
+    public function byType($type)
+    {
+        $this->getDbCriteria()->mergeWith(array(
+            'condition' => "type='".$type."'"
+        ));
+        return $this;
     }
 
 
