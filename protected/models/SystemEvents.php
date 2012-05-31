@@ -28,8 +28,6 @@
  * @property string $EventLogType
  * @property string $GenericFileName
  * @property integer $SystemID
- * @property string $type
- * @property string $hash
  * @property integer $is_analyzed
  */
 
@@ -46,7 +44,7 @@ class SystemEvents extends CActiveRecord
 
 
     protected $definedTypes = array(
-        'nginx' =>array('type'=>'nginx','class'=>'NginxEvent'),
+        'AdvancedSystemEvent' =>array('type'=>'nginx','class'=>'NginxEvent'),
         'php_fpm'=>array('type'=>'php_fpm','class'=>'PhpFpmEvent')
     );
 
@@ -79,11 +77,11 @@ class SystemEvents extends CActiveRecord
 		return array(
 			array('Facility, Priority, NTSeverity, Importance, EventCategory, EventID, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SystemID, is_analyzed', 'numerical', 'integerOnly'=>true),
 			array('CustomerID', 'length', 'max'=>20),
-			array('FromHost, EventSource, EventUser, SysLogTag, EventLogType, GenericFileName, type, hash', 'length', 'max'=>60),
+			array('FromHost, EventSource, EventUser, SysLogTag, EventLogType, GenericFileName', 'length', 'max'=>60),
 			array('ReceivedAt, DeviceReportedTime, Message, EventBinaryData', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, CustomerID, ReceivedAt, DeviceReportedTime, Facility, Priority, FromHost, Message, NTSeverity, Importance, EventSource, EventUser, EventCategory, EventID, EventBinaryData, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SysLogTag, EventLogType, GenericFileName, SystemID, type', 'safe', 'on'=>'search'),
+			array('ID, CustomerID, ReceivedAt, DeviceReportedTime, Facility, Priority, FromHost, Message, NTSeverity, Importance, EventSource, EventUser, EventCategory, EventID, EventBinaryData, MaxAvailable, CurrUsage, MinUsage, MaxUsage, InfoUnitID, SysLogTag, EventLogType, GenericFileName, SystemID', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -94,10 +92,10 @@ class SystemEvents extends CActiveRecord
 	{
 
 		return array(
-            'nginx'=>array(self::HAS_ONE, 'NginxEvent', 'system_event_id'),
-            'php_fpm'=>array(self::HAS_ONE, 'PhpFpmEvent', 'system_event_id'),
+           // 'nginx'=>array(self::HAS_ONE, 'NginxEvent', 'system_event_id'),
+            //'php_fpm'=>array(self::HAS_ONE, 'PhpFpmEvent', 'system_event_id'),
             'event_report' => array(self::BELONGS_TO, 'EventReport', 'event_report_id'),
-            'related_event'=>array(self::HAS_ONE, 'DefinedEvent', 'system_event_id'),
+            'advanced_event'=>array(self::HAS_ONE, 'AdvancedSystemEvent', 'system_event_id'),
 		);
 	}
 

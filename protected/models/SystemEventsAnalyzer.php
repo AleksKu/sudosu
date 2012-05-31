@@ -20,7 +20,7 @@ class SystemEventsAnalyzer
 
         foreach($events as $event)
         {
-            $event->getType();
+
             if($event->isDefined())
             {
                 $relatedEvent = $event->getRelatedEvent();

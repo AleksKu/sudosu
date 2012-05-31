@@ -59,27 +59,7 @@ class DefinedEvent extends CActiveRecord
     }
 
 
-    /**
-     * We're overriding this method to fill findAll() and similar method result
-     * with proper models.
-     *
-     * @param array $attributes
-     * @return DefinedEvent
-     */
-    protected function instantiate($attributes){
-        switch($attributes['type']){
-            case 'sport':
-                $class='SportCar';
-                break;
-            case 'family':
-                $class='FamilyCar';
-                break;
-            default:
-                $class=get_class($this);
-        }
-        $model=new $class(null);
-        return $model;
-    }
+
 
 
 
