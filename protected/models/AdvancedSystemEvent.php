@@ -9,7 +9,7 @@
  * @property string $client
  * @property string $server
  * @property string $request
- * @property string $refferer
+ * @property string $referrer
  *
  * @property string $type
  * @property string $hash
@@ -23,15 +23,11 @@
 class AdvancedSystemEvent extends CActiveRecord
 {
 
-    const TYPE = 'nginx';
-
-
-    protected $regexp = '/^(?<dat>.*) \[(?<error_level>.+)\] (?<nubmer>.+): \*(?<nubmer2>.+) (?<message>.+), client: (?<client>.+), server: (?<server>.+), request: (?<request>.+), (?<other>.+)$/U';
 
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
-	 * @return NginxEvent the static model class
+	 * @return AdvancedSystemEvent the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -56,14 +52,14 @@ class AdvancedSystemEvent extends CActiveRecord
 		return array(
 			array('system_event_id', 'required'),
 			array('system_event_id', 'length', 'max'=>10),
-			array('client, server, request, refferer, type, hash, file', 'length', 'max'=>255),
-			array('trace', 'length', 'max'=>65000),
+			array('client, server, request, type, hash, file', 'length', 'max'=>255),
+			array('trace, referrer', 'length', 'max'=>65000),
 			array('message', 'safe'),
             array('level', 'numerical', 'integerOnly'=>true),
 
             // The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('system_event_id, message, client, server, request, refferer, type, hash, level, file, trace', 'safe', 'on'=>'search'),
+			array('system_event_id, message, client, server, request, referrer, type, hash, level, file, trace', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -93,7 +89,7 @@ class AdvancedSystemEvent extends CActiveRecord
 			'client' => 'Client',
 			'server' => 'Server',
 			'request' => 'Request',
-			'refferer' => 'Refferer',
+			'referrer' => 'referrer',
 		);
 	}
 
@@ -115,7 +111,7 @@ class AdvancedSystemEvent extends CActiveRecord
 		$criteria->compare('client',$this->client,true);
 		$criteria->compare('server',$this->server,true);
 		$criteria->compare('request',$this->request,true);
-		$criteria->compare('refferer',$this->refferer,true);
+		$criteria->compare('referrer',$this->referrer,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -123,18 +119,5 @@ class AdvancedSystemEvent extends CActiveRecord
 	}
 
 
-    public function parseMessage()
-    {
 
-        preg_match($this->regexp, $this->systemEvent->Message, $out);
-
-
-        $this->message = isset($out['message']) ? $out['message'] : null;
-        $this->client = isset($out['client']) ? $out['client'] : null;
-        $this->server = isset($out['server']) ? $out['server'] : null;
-        $this->request = isset($out['request']) ? $out['request'] : null;
-        $this->refferer = isset($out['refferer']) ? $out['refferer'] : null;
-
-
-    }
 }

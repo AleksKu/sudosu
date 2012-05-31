@@ -223,50 +223,16 @@ class SystemEvents extends CActiveRecord
         return $tagsArray;
     }
 
-
-    public function getType()
+    public function getMainTag()
     {
-        if(empty($this->type))
-            $this->calcType();
-
-        return $this->type;
-    }
-
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-
-    /**
-     * Вычисляет тип лога
-     * @return SystemEvents
-     */
-    public function calcType()
-    {
-        $this->type = self::DEFAULT_TYPE;
         $tags = $this->getTags();
+        if(count($tags) == 1 )
+            return $tags[0];
 
-       if(count($tags) == 1 )
-       {
-           $tag  = str_replace('-','_',$tags[0]);
-           if(array_key_exists($tag, $this->definedTypes))
-                $this->type = $this->definedTypes[$tag]['type'];
-
-       }
-
-
-        return $this;
+        return null;
     }
 
-    /**
-     * получил эвент определение - известный ли у него тип?
-     * @return bool
-     */
-    public function isDefined()
-    {
-        return (!empty($this->type) && $this->type != self::DEFAULT_TYPE);
-    }
+
 
 
     public function notAnalyzed()
@@ -277,33 +243,29 @@ class SystemEvents extends CActiveRecord
         return $this;
     }
 
-    /**
-     * @return DefinedEvent
-     * @throws CException
-     */
-    public function getRelatedEvent()
+
+
+    public function analyze()
     {
-        if(!$this->isDefined())
-            throw new CException('не удалось вычислить тип для этого события - получить связанный объект нельзя');
+       $advancedEvent = $this->getRelated('advanced_event');
+        if(!$advancedEvent)
+            $advancedEvent = new AdvancedSystemEvent;
+
+       $parser = new SystemEventAnalyzer($this);
 
 
-        $related = $this->getRelated($this->type);
-        if(!$related)
+        if($parser->isDefined())
         {
-            $class = $this->getRelatedEventClassName();
-            $related = new $class;
-            $related->systemEvent = $this;
+            $parser->map($advancedEvent);
+
+            $advancedEvent->system_event_id = $this->ID;
+            $advancedEvent->save();
         }
 
-        return $related;
-
+        $this->is_analyzed=1;
 
     }
 
-    public function getRelatedEventClassName()
-    {
-        return $this->definedTypes[$this->getType()]['class'];
-    }
 
 
 }

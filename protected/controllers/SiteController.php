@@ -95,14 +95,8 @@ class SiteController extends Controller
 
     public function actionTest()
     {
-        $model = SystemEvents::model()->findByPk(14);
-        var_dump($model);
-       // echo $model->related_event->message;
 
-        die();
-
-        $model = new SystemEventsAnalyzer();
-        $model->collect();
+        SystemEventAnalyzer::collect();
     }
 
 	/**
