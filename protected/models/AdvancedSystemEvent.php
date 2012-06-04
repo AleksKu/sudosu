@@ -89,7 +89,7 @@ class AdvancedSystemEvent extends CActiveRecord
     /**
      * @static
      * @param $type
-     * @return AdvancedSystemEvent
+     * @return string
      */
     public static function getClassNameByType($type)
     {

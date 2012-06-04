@@ -167,9 +167,6 @@ class SystemEvents extends CActiveRecord
         if (in_array('phpexception', $this->getTags())) {
             preg_match('/^(?<pool>.*): (?<error_level>.+): (?<message>.+) in (?<file>.+)$/', $this->Message, $out);
 
-
-            if (isset($out['message']))
-                return $out['message'];
         }
 
     }
@@ -211,6 +208,10 @@ class SystemEvents extends CActiveRecord
 
     public function analyze()
     {
+        /**
+         * @var $advancedEvent AdvancedSystemEvent
+         */
+
         $advancedEvent = $this->getRelated('advanced_event');
 
         if (!$advancedEvent && $class = AdvancedSystemEvent::getClassNameByType($this->getMainTag())) {

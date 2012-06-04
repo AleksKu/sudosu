@@ -10,7 +10,7 @@ return array(
 	'name'=>'Adminka',
 
 	// preloading 'log' component
-	'preload'=>array('log', 'bootstrap',),
+	'preload'=>array('log','less', 'bootstrap'),
 
 	// autoloading model and component classes
 	'import'=>array(
@@ -86,6 +86,15 @@ return array(
             'class'=>'ext.bootstrap.components.Bootstrap', // assuming you extracted bootstrap under extensions
             'plugins'=>array(
                 'popover'=>array()
+            ),
+        ),
+
+        'less'=>array(
+            'class'=>'ext.less.components.LessCompiler',
+            'forceCompile'=>true, // indicates whether to force compiling
+            'paths'=>array(
+                'protected/extensions/bootstrap/lib/bootstrap/less/bootstrap.less' => 'protected/extensions/bootstrap/assets/css/bootstrap.min.css',
+                'protected/extensions/bootstrap/lib/bootstrap/less/responsive.less' => 'protected/extensions/bootstrap/assets/css/bootstrap-responsive.min.css',
             ),
         ),
 
