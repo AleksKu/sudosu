@@ -23,9 +23,15 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Расширенный лог</h1>
 
-
+<div class="box grad_colour_dark_blue" id="box_0">
+    <h2 class="box_head grad_colour round_top">Расширенный лог</h2>
+    <a href="#" class="settings box_button_3" title="config">&nbsp;</a>
+    <a href="#" class="toggle box_button_2" title="toggle">&nbsp;</a>
+    <a href="#" class="destroy box_button_1" title="close">&nbsp;</a>
+    <div class="toggle_container">
+        <div class="block box_content round_bottom padding_20">
+            <div class="row-fluid">
 <?php $this->widget('bootstrap.widgets.BootGridView', array(
     'id'=>'system-events-grid',
     'type'=>'striped bordered condensed',
@@ -56,4 +62,9 @@ $('.search-form form').submit(function(){
         ),
     ),
 )); ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 

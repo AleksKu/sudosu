@@ -103,7 +103,7 @@ class Bootstrap extends CApplicationComponent
 	 */
 	public function registerYiiCss()
 	{
-		//Yii::app()->clientScript->registerCssFile($this->getAssetsUrl().'/css/bootstrap-yii.css');
+		Yii::app()->clientScript->registerCssFile($this->getAssetsUrl().'/css/bootstrap-yii.css');
 	}
 
 	/**

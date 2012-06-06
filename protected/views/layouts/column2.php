@@ -119,31 +119,6 @@
             </div><!--/span-->
         </div><!--/row-->
 
-        <div class="row-fluid">
-            <div class="span12">
-                <div class="box grad_colour_dark_blue" id="box_0">
-                    <h2 class="box_head grad_colour round_top">Box</h2>
-                    <a href="#" class="settings box_button_3" title="config">&nbsp;</a>
-                    <a href="#" class="toggle box_button_2" title="toggle">&nbsp;</a>
-                    <a href="#" class="destroy box_button_1" title="close">&nbsp;</a>
-                    <div class="toggle_container">
-                        <div class="block box_content round_bottom padding_20">
-                            <div class="row-fluid">
-                                <div class="span4 box_padding_10">
-                                    <h6>Span 4</h6>
-                                </div>
-                                <div class="span4 box_padding_10">
-                                    <h6>Span 4</h6>
-                                </div>
-                                <div class="span4 box_padding_10">
-                                    <h6>Span 4</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div><!--/row-->
         <!-- Content end -->
 
     </div><!--/span-->
